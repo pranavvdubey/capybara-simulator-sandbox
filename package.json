@@ -1,0 +1,29 @@
+{
+  "name": "capybara-simulator",
+  "version": "1.0.0",
+  "description": "A serious and important contribution to the field of idle gaming.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "convert:unity-animals": "node scripts/convert_unity_animals.js",
+    "fetch:poly-assets": "node scripts/fetch_poly_pizza_assets.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/summer-plays/capybara-simulator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/summer-plays/capybara-simulator/issues"
+  },
+  "homepage": "https://github.com/summer-plays/capybara-simulator#readme",
+  "dependencies": {
+    "@cocos/fbx2gltf": "^1.0.8"
+  }
+}

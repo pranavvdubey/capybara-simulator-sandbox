@@ -1,0 +1,42 @@
+{
+  "source": "/Users/doobie/51 Projects/Web/Projects/PlayFun/Capybara games/capybara-simulator/.asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes",
+  "generatedAt": "2026-03-25T21:47:34.161Z",
+  "count": 7,
+  "animals": [
+    {
+      "name": "Chicken_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Chicken_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/chicken-001.glb"
+    },
+    {
+      "name": "Deer_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Deer_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/deer-001.glb"
+    },
+    {
+      "name": "Dog_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Dog_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/dog-001.glb"
+    },
+    {
+      "name": "Horse_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Horse_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/horse-001.glb"
+    },
+    {
+      "name": "Kitty_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Kitty_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/kitty-001.glb"
+    },
+    {
+      "name": "Pinguin_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Pinguin_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/pinguin-001.glb"
+    },
+    {
+      "name": "Tiger_001",
+      "sourceFile": ".asset-imports/animals-free-animated-low-poly-3d-models/Assets/ithappy/Animals_FREE/Meshes/Tiger_001.fbx",
+      "outputFile": "models/imported/ithappy-animals/tiger-001.glb"
+    }
+  ]
+}
