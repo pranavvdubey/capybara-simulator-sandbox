@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Capybara Chill Scene</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='52' font-size='52'%3E%F0%9F%90%B9%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -271,10 +272,10 @@
       background: rgba(255,255,255,0.6);
     }
 
-    /* ── CONTROLS (top-right) ────────────────────────────── */
+    /* ── CONTROLS (below biome selector, right-aligned) ─── */
     #controls {
       position: absolute;
-      top: 18px;
+      top: 78px;
       right: 20px;
       pointer-events: all;
       display: flex;
@@ -323,7 +324,7 @@
       .meter-track { height: 110px; }
       .meter-markers { display: none; }
 
-      #controls { top: 12px; right: 10px; padding: 6px 8px; gap: 5px; }
+      #controls { top: 66px; right: 10px; padding: 6px 8px; gap: 5px; }
       #controls button { width: 30px; height: 30px; }
       #controls button svg { width: 14px; height: 14px; }
     }
@@ -333,7 +334,8 @@
   {
     "imports": {
       "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "postprocessing": "./node_modules/postprocessing/build/index.js"
     }
   }
   </script>

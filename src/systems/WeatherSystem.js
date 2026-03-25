@@ -27,6 +27,10 @@ export class WeatherSystem {
     // Stars (night)
     this._stars = null;
 
+    // Snow
+    this._snowParticles = null;
+    this._snowUniforms  = null;
+
     // Current biome atmosphere baseline (day, clear)
     this._biomeBg       = new THREE.Color(0xc8dce8);
     this._biomeFogDen   = 0.014;
@@ -67,6 +71,15 @@ export class WeatherSystem {
 
   setRain(enabled) {
     this._rainTarget = enabled ? 1 : 0;
+  }
+
+  setSnow(enabled) {
+    if (enabled && !this._snowParticles) {
+      this._buildSnow();
+    }
+    if (this._snowParticles) {
+      this._snowParticles.visible = !!enabled;
+    }
   }
 
   setNight(enabled) {
@@ -138,6 +151,12 @@ export class WeatherSystem {
     // Stars visibility
     if (this._stars) {
       this._stars.material.opacity = n * 0.9;
+    }
+
+    // Snow particles
+    if (this._snowUniforms) {
+      this._snowUniforms.time.value   = elapsed;
+      this._snowUniforms.camPos.value.copy(this._camera.position);
     }
 
     // Rain audio
@@ -230,6 +249,65 @@ export class WeatherSystem {
     this._rainParticles = new THREE.Points(geo, mat);
     this._rainParticles.frustumCulled = false;
     this._scene.add(this._rainParticles);
+  }
+
+  _buildSnow() {
+    const count = 900;
+    const speeds = new Float32Array(count);
+    const seeds  = new Float32Array(count);
+    const xzOff  = new Float32Array(count * 2);
+    for (let i = 0; i < count; i++) {
+      speeds[i]      = 0.35 + Math.random() * 0.55;
+      seeds[i]       = Math.random();
+      xzOff[i * 2]   = (Math.random() - 0.5) * 40;
+      xzOff[i * 2+1] = (Math.random() - 0.5) * 40;
+    }
+
+    const geo = new THREE.BufferGeometry();
+    const dummy = new Float32Array(count * 3);
+    geo.setAttribute('position',  new THREE.BufferAttribute(dummy, 3));
+    geo.setAttribute('aSpeed',    new THREE.BufferAttribute(speeds, 1));
+    geo.setAttribute('aSeedY',    new THREE.BufferAttribute(seeds, 1));
+    geo.setAttribute('aXZOffset', new THREE.BufferAttribute(xzOff, 2));
+
+    this._snowUniforms = {
+      time:    { value: 0 },
+      camPos:  { value: new THREE.Vector3() },
+    };
+
+    const mat = new THREE.ShaderMaterial({
+      uniforms: this._snowUniforms,
+      vertexShader: `
+        attribute float aSpeed;
+        attribute float aSeedY;
+        attribute vec2  aXZOffset;
+        uniform float time;
+        uniform vec3  camPos;
+        void main() {
+          float y = mod(aSeedY * 18.0 - time * aSpeed, 19.0) + 0.5;
+          float drift = sin(time * 0.4 + aSeedY * 6.28) * 1.2;
+          vec3 wp = vec3(camPos.x + aXZOffset.x + drift, y, camPos.z + aXZOffset.y);
+          vec4 mvPos = viewMatrix * vec4(wp, 1.0);
+          gl_Position  = projectionMatrix * mvPos;
+          gl_PointSize = 280.0 / -mvPos.z;
+        }
+      `,
+      fragmentShader: `
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = dot(uv, uv);
+          if (d > 0.25) discard;
+          float alpha = (0.25 - d) * 4.0 * 0.88;
+          gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite:  false,
+    });
+
+    this._snowParticles = new THREE.Points(geo, mat);
+    this._snowParticles.frustumCulled = false;
+    this._scene.add(this._snowParticles);
   }
 
   _buildStars() {

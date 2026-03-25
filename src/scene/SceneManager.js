@@ -1,12 +1,35 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import {
+  BlendFunction,
+  BloomEffect,
+  BrightnessContrastEffect,
+  ChromaticAberrationEffect,
+  EffectComposer,
+  EffectPass,
+  NoiseEffect,
+  RenderPass,
+  SMAAEffect,
+  VignetteEffect,
+} from 'postprocessing';
 import { BIOMES } from '../core/Constants.js';
+import { OceanWater } from './OceanWater.js';
 
 // Owns: renderer, camera, OrbitControls, lights, terrain, sky, pond
 // Does NOT own biome-specific props — BiomeManager handles those
 export class SceneManager {
   constructor() {
     this._isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || navigator.maxTouchPoints > 1;
+    this._focusAnchor = null;
+    this._focusPoint = new THREE.Vector3();
+    this._postState = {
+      bloom: 0.22,
+      noise: 0.012,
+      vignette: 0.16,
+      aberration: 0.00018,
+      contrast: 0.02,
+    };
+    this._postTarget = { ...this._postState };
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: !this._isMobile,
@@ -61,17 +84,77 @@ export class SceneManager {
 
     // Terrain & static env
     this.skyMat = null;
+    this.pondWater = null;
     this._buildBase();
+    this._buildPostProcessing();
 
     window.addEventListener('resize', () => {
       this.camera.aspect = window.innerWidth / window.innerHeight;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.composer?.setSize(window.innerWidth, window.innerHeight);
     });
   }
 
   applyBiome(biomeDef) {
     this._applyBiomeCamera(biomeDef);
+  }
+
+  setFocusAnchor(anchor) {
+    this._focusAnchor = anchor;
+  }
+
+  setPostProcessingMood({
+    biomeId = BIOMES[0].id,
+    weather = 'clear',
+    time = 'day',
+    rating = 'neutral',
+  } = {}) {
+    const isNight = time === 'night';
+    const isRain = weather === 'rain';
+    const ratingBoost = rating === 'great' ? 0.12 : rating === 'good' ? 0.05 : 0;
+
+    let bloom = 0.18;
+    let noise = 0.01;
+    let vignette = 0.14;
+    let aberration = 0.00012;
+    let contrast = 0.015;
+
+    if (biomeId === 'jungle') {
+      bloom += 0.06;
+      vignette += 0.03;
+    } else if (biomeId === 'riverside') {
+      bloom += 0.02;
+      noise += 0.004;
+    } else if (biomeId === 'mountain' || biomeId === 'snowy') {
+      contrast += 0.025;
+      bloom += 0.02;
+    }
+
+    if (isNight) {
+      bloom += 0.08;
+      noise += 0.008;
+      vignette += 0.06;
+      aberration += 0.00014;
+      contrast += 0.025;
+    }
+
+    if (isRain) {
+      bloom -= 0.03;
+      noise += 0.02;
+      vignette += 0.04;
+      aberration += 0.00012;
+      contrast += 0.01;
+    }
+
+    bloom += ratingBoost * 0.45;
+    contrast += ratingBoost * 0.15;
+
+    this._postTarget.bloom = bloom;
+    this._postTarget.noise = noise;
+    this._postTarget.vignette = vignette;
+    this._postTarget.aberration = aberration;
+    this._postTarget.contrast = contrast;
   }
 
   _applyBiomeCamera(def) {
@@ -174,17 +257,102 @@ export class SceneManager {
     sandMesh.receiveShadow = true;
     this.scene.add(sandMesh);
 
-    const waterGeo = new THREE.CircleGeometry(8, 32);
+    const waterGeo = new THREE.CircleGeometry(8, 96);
     waterGeo.rotateX(-Math.PI / 2);
-    const water = new THREE.Mesh(waterGeo, new THREE.MeshLambertMaterial({
-      color: 0x6aaebb, transparent: true, opacity: 0.65,
-    }));
+    const water = new OceanWater(this.renderer, this.scene, this.camera, waterGeo, {
+      textureWidth: this._isMobile ? 256 : 512,
+      textureHeight: this._isMobile ? 256 : 512,
+      alpha: 0.84,
+      waterColor: 0x4f96a6,
+      sunColor: 0xf7e7c8,
+      distortionScale: 9.5,
+      noiseScale: 0.35,
+      fog: true,
+    });
     water.position.set(0, 0.01, -13);
+    water.receiveShadow = true;
+    this.pondWater = water;
     this.scene.add(water);
   }
 
-  render() {
+  _buildPostProcessing() {
+    this.composer = new EffectComposer(this.renderer, {
+      multisampling: 0,
+    });
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+
+    this.bloomEffect = new BloomEffect({
+      blendFunction: BlendFunction.SCREEN,
+      mipmapBlur: true,
+      intensity: this._postState.bloom,
+      luminanceThreshold: 0.72,
+      luminanceSmoothing: 0.18,
+      radius: 0.7,
+    });
+    this.chromaticAberrationEffect = new ChromaticAberrationEffect({
+      offset: new THREE.Vector2(0, 0),
+      radialModulation: true,
+      modulationOffset: 0.35,
+    });
+    this.brightnessContrastEffect = new BrightnessContrastEffect({
+      brightness: 0.0,
+      contrast: this._postState.contrast,
+    });
+    this.noiseEffect = new NoiseEffect({
+      blendFunction: BlendFunction.OVERLAY,
+      premultiply: true,
+    });
+    this.noiseEffect.blendMode.opacity.value = this._postState.noise;
+    this.vignetteEffect = new VignetteEffect({
+      eskil: false,
+      offset: 0.24,
+      darkness: this._postState.vignette,
+    });
+
+    if (!this._isMobile) {
+      this.smaaEffect = new SMAAEffect();
+      this.composer.addPass(new EffectPass(this.camera, this.smaaEffect));
+    }
+
+    this.postPass = new EffectPass(
+      this.camera,
+      this.bloomEffect,
+      this.chromaticAberrationEffect,
+      this.brightnessContrastEffect,
+      this.noiseEffect,
+      this.vignetteEffect,
+    );
+    this.composer.addPass(this.postPass);
+  }
+
+  _updatePostProcessing(delta, elapsed) {
+    const ease = 1 - Math.exp(-delta * 3.5);
+
+    for (const key of Object.keys(this._postState)) {
+      this._postState[key] += (this._postTarget[key] - this._postState[key]) * ease;
+    }
+
+    const pulse = 1 + Math.sin(elapsed * 0.55) * 0.025;
+    this.bloomEffect.intensity = this._postState.bloom * pulse;
+    this.bloomEffect.luminanceMaterial.threshold = THREE.MathUtils.clamp(
+      0.78 - this._postState.contrast * 0.35,
+      0.68,
+      0.8,
+    );
+    this.bloomEffect.luminanceMaterial.smoothing = 0.16 + this._postState.contrast * 0.2;
+    this.chromaticAberrationEffect.offset.set(
+      this._postState.aberration * 0.45,
+      this._postState.aberration,
+    );
+    this.brightnessContrastEffect.contrast = this._postState.contrast;
+    this.noiseEffect.blendMode.opacity.value = this._postState.noise;
+    this.vignetteEffect.darkness = this._postState.vignette;
+  }
+
+  render(delta = 1 / 60, elapsed = 0) {
     this.controls.update();
-    this.renderer.render(this.scene, this.camera);
+    this._updatePostProcessing(delta, elapsed);
+    this.pondWater?.update(elapsed, this.sun);
+    this.composer.render(delta);
   }
 }

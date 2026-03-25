@@ -101,6 +101,7 @@ index.html   (shell — CSS + HTML structure only)
 - 3 biomes, 4 companions, deterministic scoring
 - Day/night system with star particles
 - Removed: market cap, standing FX, hat cycling, Play.fun
+- Started modernizing the pond/river water using a local ES module port of the `jbouny/ocean` shader so it works with the current Three.js import map instead of the repo's legacy global API.
 
 ---
 
@@ -158,3 +159,44 @@ index.html   (shell — CSS + HTML structure only)
 - Browser preview: visible in preview panel at time of writing
 - Not yet verified: mobile layout, biome switch camera on actual device
 - Not yet verified: flower wind shader compatibility (uses onBeforeCompile, may need needsUpdate)
+
+---
+
+## 2026-03-26 — Post FX Repair
+
+### What changed
+
+- Removed the broken custom fullscreen post stack that was making Meadow look washed out and "inside out".
+- Switched `SceneManager` to use `pmndrs/postprocessing` directly through the browser import map.
+- Kept the stack intentionally restrained: bloom, vignette, noise, brightness/contrast, and very light chromatic aberration.
+- Fixed the local `OceanWater` fog vertex shader so water renders correctly during post-processing.
+- Disabled composer multisampling to avoid framebuffer blit warnings in software-WebGL test runs.
+
+### Verification
+
+- Meadow/day now renders with normal perspective and sane ground color again.
+- Rain/night still render and respond to control toggles.
+- Captured screenshots:
+  - `output/postfx-day.png`
+  - `output/postfx-rain.png`
+  - `output/postfx-rain-night.png`
+
+### Remaining issues
+
+- Rain sprites are still very blocky/overbright in captures, especially in rain/night. This appears to be separate from the post stack and likely lives in `WeatherSystem`'s rain sprite shader/material tuning.
+
+---
+
+## 2026-03-26 — Wagner Visual Pass
+
+### What changed
+
+- Replaced the newer `postprocessing` dependency with a local `Wagner`-style composer in `src/post/WagnerComposer.js`.
+- Added a Wagner-inspired chain: bright-pass extraction, separable bloom blur, then a composite pass with bloom, chromatic aberration, vignette, grain, and scene-tinted grading.
+- Preserved the existing `setPostProcessingMood()` API so biome/time/weather/rating still drive the visual intensity without rewiring the rest of the app.
+
+### Notes
+
+- Source reference: https://github.com/spite/Wagner
+- This is a modernized local adaptation, not a raw drop-in of the original global-script repo.
+- Still needs screenshot-based tuning after a live browser run, especially for rainy and night scenes.

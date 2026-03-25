@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/summer-plays/capybara-simulator#readme",
   "dependencies": {
-    "@cocos/fbx2gltf": "^1.0.8"
+    "@cocos/fbx2gltf": "^1.0.8",
+    "postprocessing": "^6.39.0"
   }
 }
