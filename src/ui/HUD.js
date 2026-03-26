@@ -9,10 +9,15 @@ export class HUD {
     this._bind();
 
     eventBus.on(Events.RATING_CHANGED, () => this._syncWeatherTime());
+    eventBus.on(Events.PROGRESSION_CHANGED, () => this._syncStats());
   }
 
   _render() {
     this._el.innerHTML = `
+      <div class="hud-stat">
+        <span class="hud-stat-kicker">Chill</span>
+        <strong id="hud-chill-points">${gameState.chillPoints}</strong>
+      </div>
       <button id="btn-skip" title="Skip track">
         <svg viewBox="0 0 24 24"><polygon points="5,4 15,12 5,20"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
       </button>
@@ -30,6 +35,7 @@ export class HUD {
         <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
     `;
+    this._syncStats();
   }
 
   _bind() {
@@ -41,6 +47,7 @@ export class HUD {
     this._el.querySelector('#btn-mute').addEventListener('click', (e) => {
       e.stopPropagation();
       gameState.muted = !gameState.muted;
+      gameState.save();
       this._updateMuteIcon();
       eventBus.emit(Events.AUDIO_MUTE);
     });
@@ -48,6 +55,7 @@ export class HUD {
     this._el.querySelector('#btn-rain').addEventListener('click', (e) => {
       e.stopPropagation();
       gameState.weather = gameState.weather === 'rain' ? 'clear' : 'rain';
+      gameState.save();
       this._syncWeatherTime();
       eventBus.emit(Events.WEATHER_CHANGED, { weather: gameState.weather });
     });
@@ -55,6 +63,7 @@ export class HUD {
     this._el.querySelector('#btn-night').addEventListener('click', (e) => {
       e.stopPropagation();
       gameState.time = gameState.time === 'night' ? 'day' : 'night';
+      gameState.save();
       this._syncWeatherTime();
       eventBus.emit(Events.TIME_CHANGED, { time: gameState.time });
     });
@@ -83,5 +92,10 @@ export class HUD {
         <path d="M19.07 4.93a10 10 0 010 14.14"/>
       `;
     }
+  }
+
+  _syncStats() {
+    const chill = this._el.querySelector('#hud-chill-points');
+    if (chill) chill.textContent = String(gameState.chillPoints);
   }
 }

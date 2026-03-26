@@ -38,6 +38,7 @@ export class BiomeManager {
 
     if (capy) {
       capy.setGroundPos(def.capyPos.x, def.capyPos.z, (x, z) => this._sm.getTerrainY(x, z));
+      capy.group.position.y += def.capyHeightOffset || 0;
       capy.group.rotation.y = def.capyRotY || 0;
     }
     this._sm.applyBiome(def);
@@ -517,7 +518,7 @@ export class BiomeManager {
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(22, 22),
       new THREE.MeshLambertMaterial({ color: 0x8a7060 }));
     floor.rotateX(-Math.PI / 2);
-    floor.position.set(0, -2.12, 0);
+    floor.position.set(0, 0.01, 0);
     floor.receiveShadow = true;
     group.add(floor);
 
@@ -535,15 +536,28 @@ export class BiomeManager {
 
     // ── DESK SURFACE ──
     const deskTop = new THREE.Mesh(new THREE.BoxGeometry(5.2, 0.12, 3.2), woodMat);
-    deskTop.position.set(0, -0.08, -0.4);
+    deskTop.position.set(0, 0.12, -0.4);
     deskTop.castShadow = true;
     deskTop.receiveShadow = true;
     group.add(deskTop);
 
     // Desk legs
     for (const [x, z] of [[-2.4, 1.1], [2.4, 1.1], [-2.4, -1.9], [2.4, -1.9]]) {
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.10, 2.0, 0.10), darkWood);
-      leg.position.set(x, -1.1, z);
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.24, 0.10), darkWood);
+      leg.position.set(x, 0.00, z);
+      leg.castShadow = true;
+      group.add(leg);
+    }
+
+    // Side table for loose props so the floor stays clean.
+    const sideTableTop = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.10, 1.1), woodMat);
+    sideTableTop.position.set(2.75, 0.08, 0.35);
+    sideTableTop.castShadow = true;
+    sideTableTop.receiveShadow = true;
+    group.add(sideTableTop);
+    for (const [x, z] of [[2.1, -0.1], [3.4, -0.1], [2.1, 0.8], [3.4, 0.8]]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.08), darkWood);
+      leg.position.set(x, -0.04, z);
       leg.castShadow = true;
       group.add(leg);
     }
@@ -597,7 +611,7 @@ export class BiomeManager {
     ]) {
       const paper = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.008, 0.52),
         new THREE.MeshLambertMaterial({ color: paperColors[ci] }));
-      paper.position.set(x, 0.01, z);
+      paper.position.set(x, 0.19, z);
       paper.rotation.y = ry;
       group.add(paper);
     }
@@ -605,7 +619,7 @@ export class BiomeManager {
     const lineMat = new THREE.MeshBasicMaterial({ color: 0xb8c8d8 });
     for (let i = 0; i < 5; i++) {
       const line = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.002, 0.008), lineMat);
-      line.position.set(1.1, 0.016, -0.14 + i * 0.08);
+      line.position.set(1.1, 0.196, -0.14 + i * 0.08);
       line.rotation.y = 0.18;
       group.add(line);
     }
@@ -613,7 +627,7 @@ export class BiomeManager {
     // ── PENCIL CUP ──
     const cupMat = new THREE.MeshLambertMaterial({ color: 0xe07840 });
     const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.075, 0.22, 12), cupMat);
-    cup.position.set(1.9, 0.12, 0.38);
+    cup.position.set(1.9, 0.30, 0.38);
     cup.castShadow = true;
     group.add(cup);
 
@@ -624,39 +638,39 @@ export class BiomeManager {
       const a = (i / 5) * Math.PI * 2;
       const jx = 1.9 + Math.cos(a) * 0.042;
       const jz = 0.38 + Math.sin(a) * 0.042;
-      pencil.position.set(jx, 0.25, jz);
+      pencil.position.set(jx, 0.43, jz);
       pencil.rotation.z = (Math.random() - 0.5) * 0.18;
       pencil.castShadow = true;
       group.add(pencil);
       // Tip
       const tip = new THREE.Mesh(new THREE.ConeGeometry(0.014, 0.04, 6),
         new THREE.MeshLambertMaterial({ color: 0xf5dca0 }));
-      tip.position.set(jx, 0.25 + 0.20, jz);
+      tip.position.set(jx, 0.63, jz);
       group.add(tip);
     }
 
     // ── MUG (steaming) ──
     const mugMat = new THREE.MeshLambertMaterial({ color: 0x6080a8 });
     const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.18, 12), mugMat);
-    mug.position.set(-1.8, 0.10, 0.42);
+    mug.position.set(2.35, 0.18, 0.25);
     mug.castShadow = true;
     group.add(mug);
     const handle = new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.014, 6, 10, Math.PI), mugMat);
-    handle.position.set(-1.93, 0.10, 0.42);
+    handle.position.set(2.22, 0.18, 0.25);
     handle.rotation.y = Math.PI / 2;
     group.add(handle);
     // Steam wisps
     const steamMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 });
     for (let i = 0; i < 3; i++) {
       const wisp = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.014, 0.18, 4), steamMat);
-      wisp.position.set(-1.8 + (i - 1) * 0.028, 0.28, 0.42);
+      wisp.position.set(2.35 + (i - 1) * 0.028, 0.36, 0.25);
       group.add(wisp);
     }
 
     // ── SMALL PLANT ──
     const potMat2 = new THREE.MeshLambertMaterial({ color: 0xb05840 });
     const pot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.07, 0.13, 9), potMat2);
-    pot2.position.set(-2.0, 0.08, -0.25);
+    pot2.position.set(3.08, 0.16, 0.48);
     pot2.castShadow = true;
     group.add(pot2);
     const leafMat = new THREE.MeshLambertMaterial({ color: 0x3a9030 });
@@ -664,7 +678,7 @@ export class BiomeManager {
       const a = (i / 6) * Math.PI * 2;
       const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 5), leafMat);
       leaf.scale.set(0.55, 0.45, 0.9);
-      leaf.position.set(-2.0 + Math.cos(a) * 0.09, 0.22, -0.25 + Math.sin(a) * 0.09);
+      leaf.position.set(3.08 + Math.cos(a) * 0.09, 0.30, 0.48 + Math.sin(a) * 0.09);
       leaf.rotation.z = a;
       leaf.castShadow = true;
       group.add(leaf);
@@ -700,19 +714,19 @@ export class BiomeManager {
     // ── DESK LAMP ──
     const lampMat = new THREE.MeshLambertMaterial({ color: 0x3a3a3a });
     const lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.04, 10), lampMat);
-    lampBase.position.set(-0.5, 0.02, -1.2);
+    lampBase.position.set(-0.5, 0.20, -1.2);
     group.add(lampBase);
     const lampArm = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.7, 6), lampMat);
-    lampArm.position.set(-0.5, 0.37, -1.2);
+    lampArm.position.set(-0.5, 0.55, -1.2);
     lampArm.rotation.z = 0.18;
     group.add(lampArm);
     const lampHead = new THREE.Mesh(new THREE.ConeGeometry(0.10, 0.14, 10, 1, true), lampMat);
-    lampHead.position.set(-0.42, 0.74, -1.2);
+    lampHead.position.set(-0.42, 0.92, -1.2);
     lampHead.rotation.z = -Math.PI;
     group.add(lampHead);
     // Warm point light from lamp
     const lampLight = new THREE.PointLight(0xffe8a0, 0.8, 3.5);
-    lampLight.position.set(-0.42, 0.7, -1.2);
+    lampLight.position.set(-0.42, 0.88, -1.2);
     group.add(lampLight);
   }
 

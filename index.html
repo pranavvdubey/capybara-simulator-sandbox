@@ -105,6 +105,18 @@
       align-items: center;
       gap: 14px;
     }
+    .biome-name-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Quicksand', sans-serif;
+      border-radius: 10px;
+      padding: 4px 8px;
+      transition: color 0.2s, background 0.2s;
+    }
+    .biome-name-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
     .biome-prev-name,
     .biome-next-name {
       font-size: 12px;
@@ -124,6 +136,11 @@
       text-transform: uppercase;
       min-width: 90px;
       text-align: center;
+    }
+    .biome-cur-name:hover,
+    .biome-prev-name:hover,
+    .biome-next-name:hover {
+      color: rgba(255,255,255,0.95);
     }
 
     /* ── COMPANION SELECTOR (bottom-center) ─────────────── */
@@ -189,6 +206,9 @@
       gap: 8px;
       padding: 16px 12px;
       width: 52px;
+    }
+    #rating-meter.peak {
+      box-shadow: 0 0 24px rgba(196,232,106,0.16);
     }
 
     .meter-label-top {
@@ -283,6 +303,25 @@
       align-items: center;
       padding: 8px 12px;
     }
+    .hud-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      margin-right: 6px;
+      color: rgba(255,255,255,0.9);
+      min-width: 56px;
+    }
+    .hud-stat-kicker {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.42);
+    }
+    .hud-stat strong {
+      font-size: 15px;
+      font-weight: 600;
+    }
 
     #controls button {
       background: transparent;
@@ -309,8 +348,173 @@
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
+    #journal-panel {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      width: min(340px, calc(100vw - 120px));
+      pointer-events: none;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .journal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .journal-kicker {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 4px;
+    }
+    .journal-title {
+      font-size: 17px;
+      color: rgba(255,255,255,0.92);
+      font-weight: 600;
+    }
+    .journal-points {
+      font-size: 24px;
+      line-height: 1;
+      color: #d9ee9a;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .journal-points span {
+      font-size: 11px;
+      color: rgba(255,255,255,0.48);
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      margin-left: 4px;
+    }
+    .journal-hint {
+      color: rgba(255,255,255,0.72);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .journal-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.8);
+    }
+    .journal-progress.complete {
+      border-color: rgba(180,240,130,0.28);
+      background: rgba(150,210,110,0.1);
+    }
+    .journal-progress span {
+      color: rgba(255,255,255,0.46);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-size: 10px;
+    }
+    .journal-progress strong {
+      text-align: right;
+      font-size: 12px;
+      color: rgba(255,255,255,0.92);
+    }
+    .journal-flags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .journal-flag {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.1px;
+      color: rgba(255,255,255,0.62);
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+    }
+    .journal-flag.active {
+      color: rgba(240,255,210,0.92);
+      border-color: rgba(196,232,106,0.35);
+      background: rgba(196,232,106,0.1);
+    }
+
+    #interaction-panel {
+      position: absolute;
+      left: 18px;
+      bottom: 22px;
+      pointer-events: all;
+      display: flex;
+      gap: 10px;
+      width: min(520px, calc(100vw - 100px));
+    }
+    .interaction-btn {
+      flex: 1 1 0;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(10,14,10,0.55);
+      color: rgba(255,255,255,0.86);
+      border-radius: 16px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      backdrop-filter: blur(12px) saturate(1.2);
+      -webkit-backdrop-filter: blur(12px) saturate(1.2);
+      transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      min-height: 78px;
+    }
+    .interaction-btn:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+    }
+    .interaction-btn.active {
+      border-color: rgba(212,238,144,0.42);
+      background: rgba(170,205,110,0.11);
+    }
+    .interaction-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: rgba(255,255,255,0.45);
+    }
+    .interaction-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.94);
+    }
+    .interaction-reward {
+      font-size: 11px;
+      color: #d9ee9a;
+    }
+
+    .biome-name-btn.locked,
+    .companion-btn.locked {
+      opacity: 0.58;
+    }
+    .biome-name-btn.locked {
+      color: rgba(255,255,255,0.22);
+    }
+    .companion-btn.locked {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.38);
+    }
+
     /* ── MOBILE ──────────────────────────────────────────── */
     @media (max-width: 600px) {
+      #journal-panel {
+        left: 12px;
+        top: 12px;
+        width: calc(100vw - 24px);
+        padding: 12px;
+      }
       #biome-selector { top: 12px; padding: 8px 14px; gap: 8px; }
       .biome-cur-name { font-size: 14px; }
       .biome-prev-name, .biome-next-name { font-size: 10px; min-width: 44px; }
@@ -324,9 +528,23 @@
       .meter-track { height: 110px; }
       .meter-markers { display: none; }
 
-      #controls { top: 66px; right: 10px; padding: 6px 8px; gap: 5px; }
+      #controls { top: 170px; right: 10px; padding: 6px 8px; gap: 5px; }
       #controls button { width: 30px; height: 30px; }
       #controls button svg { width: 14px; height: 14px; }
+      .hud-stat { display: none; }
+      #interaction-panel {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        bottom: 98px;
+        gap: 8px;
+      }
+      .interaction-btn {
+        min-height: 70px;
+        padding: 10px;
+      }
+      .interaction-title { font-size: 13px; }
+      .interaction-reward { font-size: 10px; }
     }
   </style>
 
@@ -351,6 +569,8 @@
 
   <!-- HUD overlay -->
   <div id="hud">
+    <div id="journal-panel" class="glass"></div>
+
     <!-- Top-center: biome selector -->
     <div id="biome-selector" class="glass"></div>
 
@@ -362,6 +582,8 @@
 
     <!-- Bottom-center: companion selector -->
     <div id="companion-selector" class="glass"></div>
+
+    <div id="interaction-panel"></div>
   </div>
 
   <script type="module" src="src/main.js"></script>

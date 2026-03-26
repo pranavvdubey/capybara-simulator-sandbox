@@ -173,7 +173,7 @@ export class WeatherSystem {
 
   _buildRain() {
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const count = isMobile ? 1500 : 3000;
+    const count = isMobile ? 1100 : 2200;
 
     const speeds    = new Float32Array(count);
     const seedsY    = new Float32Array(count);
@@ -194,16 +194,16 @@ export class WeatherSystem {
 
     // Raindrop sprite
     const canvas = document.createElement('canvas');
-    canvas.width = 8; canvas.height = 128;
+    canvas.width = 12; canvas.height = 160;
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 0, 128);
-    grad.addColorStop(0,   'rgba(200,215,230,0)');
-    grad.addColorStop(0.1, 'rgba(220,235,250,0.4)');
-    grad.addColorStop(0.4, 'rgba(255,255,255,0.9)');
-    grad.addColorStop(0.9, 'rgba(200,215,230,0.3)');
-    grad.addColorStop(1,   'rgba(200,215,230,0)');
+    const grad = ctx.createLinearGradient(0, 0, 0, 160);
+    grad.addColorStop(0,   'rgba(180,205,225,0)');
+    grad.addColorStop(0.15,'rgba(205,225,245,0.18)');
+    grad.addColorStop(0.45,'rgba(230,242,255,0.58)');
+    grad.addColorStop(0.8, 'rgba(205,225,245,0.12)');
+    grad.addColorStop(1,   'rgba(180,205,225,0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(3, 0, 2, 128);
+    ctx.fillRect(5, 0, 2, 160);
     const tex = new THREE.CanvasTexture(canvas);
 
     this._rainUniforms = {
@@ -228,7 +228,7 @@ export class WeatherSystem {
           vec3 wp = vec3(camPos.x + aXZOffset.x, y, camPos.z + aXZOffset.y);
           vec4 mvPos = viewMatrix * vec4(wp, 1.0);
           gl_Position  = projectionMatrix * mvPos;
-          gl_PointSize = 600.0 / -mvPos.z;
+          gl_PointSize = 340.0 / -mvPos.z;
           vAlpha = opacity;
         }
       `,
@@ -243,7 +243,7 @@ export class WeatherSystem {
       `,
       transparent: true,
       depthWrite:  false,
-      blending:    THREE.AdditiveBlending,
+      blending:    THREE.NormalBlending,
     });
 
     this._rainParticles = new THREE.Points(geo, mat);

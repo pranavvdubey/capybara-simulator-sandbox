@@ -14,6 +14,7 @@ export class CapybaraActor {
     this._headBaseRot = { x: 0, y: 0, z: 0 };
     this._worldPos = new THREE.Vector3();
     this._elapsed  = 0;
+    this._groundPos = new THREE.Vector3();
   }
 
   async load(loader, scene) {
@@ -70,6 +71,17 @@ export class CapybaraActor {
     if (!this.group) return;
     const y = getTerrainY(x, z);
     this.group.position.set(x, y - 0.05, z);
+    this._groundPos.copy(this.group.position);
+  }
+
+  setWorldPos(x, y, z) {
+    if (!this.group) return;
+    this.group.position.set(x, y, z);
+  }
+
+  restoreGroundPose() {
+    if (!this.group) return;
+    this.group.position.copy(this._groundPos);
   }
 
   // Returns head bone world position (or capy pos + offset if no bone)

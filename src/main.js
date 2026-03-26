@@ -12,11 +12,15 @@ import { CompanionManager } from './scene/CompanionManager.js';
 import { WeatherSystem } from './systems/WeatherSystem.js';
 import { AudioManager }  from './systems/AudioManager.js';
 import { RatingSystem }  from './systems/RatingSystem.js';
+import { ProgressionSystem } from './systems/ProgressionSystem.js';
+import { InteractionSystem } from './systems/InteractionSystem.js';
 
 import { BiomeSelector }     from './ui/BiomeSelector.js';
 import { CompanionSelector } from './ui/CompanionSelector.js';
 import { RatingMeter }       from './ui/RatingMeter.js';
 import { HUD }               from './ui/HUD.js';
+import { JournalPanel } from './ui/JournalPanel.js';
+import { InteractionPanel } from './ui/InteractionPanel.js';
 
 // ── ASSET LIST ────────────────────────────────────────────────────────────────
 const ASSET_KEYS = {
@@ -82,12 +86,18 @@ async function main() {
 
   // ── RATING ────────────────────────────────────────────────────────────────
   const rating = new RatingSystem();
+  const progression = new ProgressionSystem();
+  const interactions = new InteractionSystem(sm.scene, capy, companions);
 
   // ── UI ────────────────────────────────────────────────────────────────────
   const biomeSelector     = new BiomeSelector(document.getElementById('biome-selector'));
   const companionSelector = new CompanionSelector(document.getElementById('companion-selector'));
   const ratingMeter       = new RatingMeter(document.getElementById('rating-meter'), rating);
   const hud               = new HUD(document.getElementById('controls'));
+  const journal           = new JournalPanel(document.getElementById('journal-panel'));
+  const interactionPanel  = new InteractionPanel(document.getElementById('interaction-panel'));
+  void journal;
+  void interactionPanel;
 
   const syncMood = () => {
     sm.setPostProcessingMood({
@@ -104,12 +114,15 @@ async function main() {
     // Clear companion (selector already cleared state via GameState)
     companions.setCompanion(gameState.companion);
     ratingMeter.recalculate();
+    eventBus.emit(Events.PROGRESSION_CHANGED, progression.snapshot());
+    audio.setBiomeAmbience(biome);
     syncMood();
   });
 
   eventBus.on(Events.COMPANION_CHANGED, ({ companion }) => {
     companions.setCompanion(companion);
     ratingMeter.recalculate();
+    eventBus.emit(Events.PROGRESSION_CHANGED, progression.snapshot());
     syncMood();
   });
 
@@ -126,8 +139,30 @@ async function main() {
     syncMood();
   });
 
+  eventBus.on(Events.RATING_CHANGED, (data) => {
+    progression.onRatingChanged(data);
+  });
+
+  eventBus.on(Events.INTERACTION_TRIGGERED, ({ type }) => {
+    interactions.trigger(type);
+  });
+
+  eventBus.on(Events.PEAK_MOMENT_STARTED, ({ biome }) => {
+    sm.setPeakMoment(true);
+    interactions.startPeakMoment(biome);
+    syncMood();
+  });
+
+  eventBus.on(Events.PEAK_MOMENT_ENDED, () => {
+    sm.setPeakMoment(false);
+    interactions.endPeakMoment();
+    syncMood();
+  });
+
   // Initial rating
   ratingMeter.recalculate();
+  audio.setBiomeAmbience(gameState.biome);
+  eventBus.emit(Events.PROGRESSION_CHANGED, progression.snapshot());
   syncMood();
 
   // ── HIDE LOADING ──────────────────────────────────────────────────────────
@@ -145,6 +180,9 @@ async function main() {
     companions.update(delta, elapsed);
     biomeManager.update(delta, elapsed);
     weather.update(delta, elapsed);
+    interactions.update(delta, elapsed);
+    progression.update(elapsed);
+    audio.update(delta);
 
     sm.render(delta, elapsed);
   };
@@ -166,6 +204,11 @@ async function main() {
       time: gameState.time,
       rating: gameState.rating,
       ratingScore: gameState.ratingScore,
+      chillPoints: gameState.chillPoints,
+      unlockedBiomes: gameState.unlockedBiomes,
+      unlockedCompanions: gameState.unlockedCompanions,
+      activeInteraction: gameState.activeInteraction,
+      peakMoment: gameState.peakMoment,
       camera: {
         x: Number(sm.camera.position.x.toFixed(2)),
         y: Number(sm.camera.position.y.toFixed(2)),

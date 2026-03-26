@@ -29,13 +29,19 @@ export class CompanionSelector {
       const btn = document.createElement('button');
       btn.className = 'companion-btn';
       btn.dataset.id = def.id;
-      btn.title = def.name;
-      btn.innerHTML = `<span class="companion-emoji">${def.emoji}</span><span class="companion-name">${def.name}</span>`;
+      const unlocked = gameState.hasCompanion(def.id);
+      btn.title = unlocked ? def.unlockLabel || def.name : `Locked • ${def.unlockCost} chill`;
+      btn.innerHTML = `
+        <span class="companion-emoji">${unlocked ? def.emoji : '🔒'}</span>
+        <span class="companion-name">${unlocked ? def.name : 'Locked'}</span>
+      `;
+      btn.classList.toggle('locked', !unlocked);
       if (gameState.companion === def.id) btn.classList.add('active');
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (!gameState.hasCompanion(def.id)) return;
         const next = gameState.companion === def.id ? null : def.id;
-        gameState.companion = next;
+        gameState.setCompanion(next);
         this._highlightActive();
         eventBus.emit(Events.COMPANION_CHANGED, { companion: next });
       });

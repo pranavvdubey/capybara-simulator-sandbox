@@ -32,6 +32,11 @@ export const Events = {
   WEATHER_CHANGED:    'weather:changed',
   TIME_CHANGED:       'time:changed',
   RATING_CHANGED:     'rating:changed',
+  PROGRESSION_CHANGED:'progression:changed',
+  INTERACTION_TRIGGERED:'interaction:triggered',
+  INTERACTION_STATE_CHANGED:'interaction:state-changed',
+  PEAK_MOMENT_STARTED:'peak-moment:started',
+  PEAK_MOMENT_ENDED:  'peak-moment:ended',
   AUDIO_SKIP:         'audio:skip',
   AUDIO_MUTE:         'audio:mute',
 };

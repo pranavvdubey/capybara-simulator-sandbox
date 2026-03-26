@@ -4,6 +4,9 @@ export const BIOMES = [
   {
     id: 'meadow',
     name: 'Meadow',
+    badge: 'Starter',
+    unlockCost: 0,
+    rewardLabel: 'Mountain Top + Eagle',
     capyPos: { x: 0, z: 0 },
     capyRotY: 0,
     orbitTarget: { x: 0, y: 0.5, z: 0 },
@@ -23,6 +26,9 @@ export const BIOMES = [
   {
     id: 'riverside',
     name: 'Riverside',
+    badge: 'Mist',
+    unlockCost: 0,
+    rewardLabel: 'Snowy Peak + Lantern glow',
     capyPos: { x: 2, z: -4 },
     capyRotY: -0.4,
     orbitTarget: { x: 2, y: 0.5, z: -4 },
@@ -42,6 +48,9 @@ export const BIOMES = [
   {
     id: 'jungle',
     name: 'Jungle',
+    badge: 'Lush',
+    unlockCost: 0,
+    rewardLabel: 'Lofi Desk + Desk Set',
     capyPos: { x: 0, z: -2 },
     capyRotY: 0,
     orbitTarget: { x: 0, y: 0.5, z: -2 },
@@ -61,6 +70,9 @@ export const BIOMES = [
   {
     id: 'mountain',
     name: 'Mountain Top',
+    badge: 'Summit',
+    unlockCost: 45,
+    rewardLabel: 'Hero perch unlocked',
     capyPos: { x: 0, z: 0 },
     capyRotY: 0,
     orbitTarget: { x: 0, y: 0.5, z: 0 },
@@ -80,6 +92,9 @@ export const BIOMES = [
   {
     id: 'snowy',
     name: 'Snowy Peak',
+    badge: 'Frost',
+    unlockCost: 60,
+    rewardLabel: 'Snow sparkle trail',
     capyPos: { x: 0, z: 0 },
     capyRotY: 0,
     orbitTarget: { x: 0, y: 0.5, z: 0 },
@@ -95,15 +110,19 @@ export const BIOMES = [
     hemiGround:     '#888898',
     ambientIntensity: 0.55,
     autoSnow:       true,   // enables snow particles on biome enter
-    companions: ['rabbit', 'penguin'],
+    companions: ['rabbit'],
   },
   {
     id: 'lofi-desk',
     name: 'Lofi Desk',
-    capyPos: { x: 0, z: 0 },
+    badge: 'Cozy',
+    unlockCost: 75,
+    rewardLabel: 'Golden hour desk vibe',
+    capyPos: { x: -0.15, z: 0.2 },
+    capyHeightOffset: 0.26,
     capyRotY: 0,
-    orbitTarget: { x: 0, y: 0.3, z: 0.4 },
-    cameraPos: { x: 2.5, y: 1.2, z: 2.8 },
+    orbitTarget: { x: -0.15, y: 1.18, z: 0.15 },
+    cameraPos: { x: 2.8, y: 1.6, z: 2.85 },
     minDist: 1.5, maxDist: 6,
     minPolar: Math.PI / 5, maxPolar: Math.PI / 2.1,
     bg:             '#c4a878',
@@ -125,6 +144,8 @@ export const COMPANIONS = [
     id: 'bee',
     name: 'Bee',
     emoji: '🐝',
+    unlockCost: 0,
+    unlockLabel: 'Open meadow energy',
     placementMode: 'hover_around',
     allowedBiomes: ['meadow', 'jungle'],
     preferTime: 'day',
@@ -138,6 +159,8 @@ export const COMPANIONS = [
     id: 'firefly',
     name: 'Firefly',
     emoji: '✨',
+    unlockCost: 0,
+    unlockLabel: 'Night sparkle',
     placementMode: 'hover_around',
     allowedBiomes: ['riverside', 'jungle'],
     preferTime: 'night',
@@ -151,6 +174,8 @@ export const COMPANIONS = [
     id: 'frog',
     name: 'Frog',
     emoji: '🐸',
+    unlockCost: 12,
+    unlockLabel: 'Riverside treat expert',
     placementMode: 'sit_on_capy',
     allowedBiomes: ['riverside'],
     preferTime: 'any',
@@ -162,24 +187,29 @@ export const COMPANIONS = [
     id: 'rabbit',
     name: 'Rabbit',
     emoji: '🐰',
+    unlockCost: 12,
+    unlockLabel: 'Meadow picnic pal',
     placementMode: 'sit_on_capy',
     allowedBiomes: ['meadow', 'mountain', 'snowy'],
     preferTime: 'day',
     preferWeather: 'clear',
-    sitAnchor: { x: 0, y: 0.95, z: -0.05 },
+    sitAnchor: { x: 0, y: 1.3, z: -0.02 },
     specialCombo: { biome: 'meadow', time: 'day' },
   },
   {
     id: 'eagle',
     name: 'Eagle',
     emoji: '🦅',
-    placementMode: 'hover_around',
+    unlockCost: 0,
+    unlockLabel: 'Mountain mastery reward',
+    placementMode: 'capy_on_companion',
     allowedBiomes: ['mountain'],
     preferTime: 'day',
     preferWeather: 'clear',
-    hoverRadius: 2.8,
-    hoverHeight: 2.4,
-    hoverSpeed: 0.28,
+    hoverRadius: 0.5,
+    hoverHeight: 1.4,
+    hoverSpeed: 0.32,
+    riderAnchor: { x: 0, y: 0.8, z: -0.05 },
     specialCombo: { biome: 'mountain', time: 'day', weather: 'clear' },
   },
   {
@@ -238,6 +268,219 @@ export const COMPANIONS = [
     specialCombo: { weather: 'clear', biome: 'lofi-desk' },
   },
 ];
+
+export const INITIAL_UNLOCKED_BIOMES = ['meadow', 'riverside', 'jungle'];
+export const INITIAL_UNLOCKED_COMPANIONS = ['bee', 'firefly'];
+
+export const BIOME_MILESTONES = {
+  meadow: {
+    title: 'Picnic Peak',
+    hint: 'Bee + day + clear reaches Meadow Peak.',
+    combo: { biome: 'meadow', companion: 'bee', time: 'day', weather: 'clear', rating: 'great' },
+    reward: {
+      chillPoints: 18,
+      biomes: ['mountain'],
+      companions: ['rabbit', 'eagle'],
+    },
+  },
+  riverside: {
+    title: 'Lantern Drift',
+    hint: 'Frog + rain on Riverside triggers a misty masterpiece.',
+    combo: { biome: 'riverside', companion: 'frog', time: 'any', weather: 'rain', rating: 'great' },
+    reward: {
+      chillPoints: 20,
+      biomes: ['snowy'],
+      companions: ['frog'],
+    },
+  },
+  jungle: {
+    title: 'Canopy Glow',
+    hint: 'Firefly + night in Jungle opens the studio desk.',
+    combo: { biome: 'jungle', companion: 'firefly', time: 'night', weather: 'any', rating: 'great' },
+    reward: {
+      chillPoints: 24,
+      biomes: ['lofi-desk'],
+      companions: ['laptop', 'headphones', 'sunglasses', 'lemonade'],
+    },
+  },
+  mountain: {
+    title: 'Sky Parade',
+    hint: 'Eagle + clear day at the summit calls a hero flyover.',
+    combo: { biome: 'mountain', companion: 'eagle', time: 'day', weather: 'clear', rating: 'great' },
+    reward: {
+      chillPoints: 16,
+      biomes: [],
+      companions: [],
+    },
+  },
+  snowy: {
+    title: 'Frost Glow',
+    hint: 'Rabbit + clear day makes the snow sparkle.',
+    combo: { biome: 'snowy', companion: 'rabbit', time: 'day', weather: 'clear', rating: 'great' },
+    reward: {
+      chillPoints: 16,
+      biomes: [],
+      companions: [],
+    },
+  },
+  'lofi-desk': {
+    title: 'Desk Flow',
+    hint: 'Laptop + night keeps the final cozy loop humming.',
+    combo: { biome: 'lofi-desk', companion: 'laptop', time: 'night', weather: 'any', rating: 'great' },
+    reward: {
+      chillPoints: 16,
+      biomes: [],
+      companions: [],
+    },
+  },
+};
+
+export const INTERACTIONS = {
+  meadow: {
+    relax: {
+      label: 'Relax',
+      title: 'Picnic Pause',
+      description: 'Blanket, petals, and a slow golden sway.',
+      reward: 4,
+      effect: 'petal-bloom',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Carrot Gift',
+      description: 'A snack toss and soft heart pop.',
+      reward: 6,
+      effect: 'carrot-gift',
+    },
+    play: {
+      label: 'Play',
+      title: 'Bee Swirl',
+      description: 'A looping ribbon of flowers and buzzing motion.',
+      reward: 7,
+      effect: 'bee-spiral',
+    },
+  },
+  riverside: {
+    relax: {
+      label: 'Relax',
+      title: 'Lantern Drift',
+      description: 'Warm lights float across the waterline.',
+      reward: 5,
+      effect: 'lantern-drift',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Lily Treat',
+      description: 'A soft toss toward the frog and a ripple ring.',
+      reward: 6,
+      effect: 'lily-treat',
+    },
+    play: {
+      label: 'Play',
+      title: 'Splash Chorus',
+      description: 'Frog splashes and glowing water rings.',
+      reward: 8,
+      effect: 'splash-rings',
+    },
+  },
+  jungle: {
+    relax: {
+      label: 'Relax',
+      title: 'Canopy Hush',
+      description: 'Glowing canopy motes settle over the capybara.',
+      reward: 5,
+      effect: 'canopy-hush',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Fruit Toss',
+      description: 'Bright fruit arcs through the air and bursts into color.',
+      reward: 6,
+      effect: 'fruit-toss',
+    },
+    play: {
+      label: 'Play',
+      title: 'Bird Flyover',
+      description: 'A flock cuts through the frame with jungle glow.',
+      reward: 8,
+      effect: 'bird-flyover',
+    },
+  },
+  mountain: {
+    relax: {
+      label: 'Relax',
+      title: 'Cloud Rest',
+      description: 'A crisp wind and soft cloud drift.',
+      reward: 5,
+      effect: 'cloud-rest',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Trail Mix',
+      description: 'A neat toss of summit snacks.',
+      reward: 6,
+      effect: 'trail-mix',
+    },
+    play: {
+      label: 'Play',
+      title: 'Glider Run',
+      description: 'A high pass with fast moving trails.',
+      reward: 8,
+      effect: 'glider-run',
+    },
+  },
+  snowy: {
+    relax: {
+      label: 'Relax',
+      title: 'Snow Nest',
+      description: 'A powder-soft nest forms around the capybara.',
+      reward: 5,
+      effect: 'snow-nest',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Berry Pop',
+      description: 'A bright treat and a frosty sparkle burst.',
+      reward: 6,
+      effect: 'berry-pop',
+    },
+    play: {
+      label: 'Play',
+      title: 'Aurora Dash',
+      description: 'An aurora ribbon sweeps through the scene.',
+      reward: 8,
+      effect: 'aurora-dash',
+    },
+  },
+  'lofi-desk': {
+    relax: {
+      label: 'Relax',
+      title: 'Desk Drift',
+      description: 'Lamp glow, steam, and a tiny floating beat pulse.',
+      reward: 5,
+      effect: 'desk-drift',
+    },
+    treat: {
+      label: 'Treat',
+      title: 'Citrus Sip',
+      description: 'A small refresh and screen sparkle.',
+      reward: 6,
+      effect: 'citrus-sip',
+    },
+    play: {
+      label: 'Play',
+      title: 'Beat Bounce',
+      description: 'The desk scene pulses with a cozy rhythm.',
+      reward: 8,
+      effect: 'beat-bounce',
+    },
+  },
+};
+
+export const PEAK_MOMENT = {
+  duration: 6.5,
+  cooldown: 18,
+  chillBonus: 14,
+};
 
 // ─── SCORING ───────────────────────────────────────────────────────────────────
 export const SCORING = {

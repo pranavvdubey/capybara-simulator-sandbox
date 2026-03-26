@@ -20,6 +20,7 @@ export class CompanionManager {
     this._current = id;
     this._actor = this._buildMesh(def);
     this._scene.add(this._actor);
+    this._setupTrail(this._actor);
   }
 
   setNight(isNight) {
@@ -39,6 +40,8 @@ export class CompanionManager {
       this._updateHover(def, elapsed);
     } else if (def.placementMode === 'sit_on_capy') {
       this._updateSitOnCapy(def);
+    } else if (def.placementMode === 'capy_on_companion') {
+      this._updateCarry(def, elapsed);
     }
 
     // Wing flap — bee
@@ -83,14 +86,18 @@ export class CompanionManager {
         light.intensity = (this._isNight ? 2.2 : 0.7) * pulse;
       }
     }
+
+    this._updateTrail(delta);
   }
 
   _clearCurrent() {
     if (this._actor) {
+      this._teardownTrail(this._actor);
       this._scene.remove(this._actor);
       this._disposeGroup(this._actor);
       this._actor = null;
     }
+    this._capy?.restoreGroundPose?.();
     this._current = null;
   }
 
@@ -121,6 +128,92 @@ export class CompanionManager {
       capyPos.z + anchor.z,
     );
     this._actor.rotation.y = this._capy.group.rotation.y;
+  }
+
+  _updateCarry(def, elapsed) {
+    const capyBase = new THREE.Vector3();
+    this._capy.getBackWorldPos(capyBase);
+    const bob = Math.sin(elapsed * 2.1) * 0.08;
+    const sway = Math.sin(elapsed * def.hoverSpeed * 4) * 0.18;
+    this._actor.position.set(
+      capyBase.x + sway,
+      capyBase.y + def.hoverHeight + bob,
+      capyBase.z,
+    );
+    this._actor.rotation.y = Math.PI + Math.sin(elapsed * 0.6) * 0.15;
+    const rider = def.riderAnchor || { x: 0, y: 0.8, z: 0 };
+    this._capy.setWorldPos(
+      this._actor.position.x + rider.x,
+      this._actor.position.y + rider.y,
+      this._actor.position.z + rider.z,
+    );
+  }
+
+  _setupTrail(actor) {
+    const config = actor?.userData?.trailConfig;
+    if (!config) return;
+    const segments = [];
+    for (let i = 0; i < config.count; i++) {
+      const material = new THREE.MeshBasicMaterial({
+        color: config.color,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const segment = new THREE.Mesh(new THREE.SphereGeometry(config.size, 8, 8), material);
+      segment.visible = false;
+      segment.renderOrder = 1;
+      segments.push(segment);
+      this._scene.add(segment);
+    }
+    actor.userData.trail = {
+      interval: config.interval,
+      maxOpacity: config.opacity,
+      scaleDecay: config.scaleDecay ?? 0.12,
+      accumulator: config.interval,
+      history: [],
+      segments,
+    };
+  }
+
+  _updateTrail(delta) {
+    const trail = this._actor?.userData?.trail;
+    if (!trail) return;
+
+    trail.accumulator += delta;
+    if (trail.accumulator >= trail.interval) {
+      trail.accumulator = 0;
+      trail.history.unshift(this._actor.position.clone());
+      trail.history.length = Math.min(trail.history.length, trail.segments.length);
+    }
+
+    for (let i = 0; i < trail.segments.length; i++) {
+      const segment = trail.segments[i];
+      const pos = trail.history[i];
+      if (!pos) {
+        segment.visible = false;
+        continue;
+      }
+
+      const t = 1 - i / trail.segments.length;
+      const scale = 1 - i * trail.scaleDecay;
+      segment.visible = true;
+      segment.position.copy(pos);
+      segment.scale.setScalar(Math.max(scale, 0.18));
+      segment.material.opacity = trail.maxOpacity * t * t;
+    }
+  }
+
+  _teardownTrail(actor) {
+    const trail = actor?.userData?.trail;
+    if (!trail) return;
+    for (const segment of trail.segments) {
+      this._scene.remove(segment);
+      segment.geometry.dispose();
+      segment.material.dispose();
+    }
+    delete actor.userData.trail;
   }
 
   // ── PROCEDURAL MESHES ──────────────────────────────────────────────────────
@@ -175,6 +268,14 @@ export class CompanionManager {
     wR.position.set( 0.18, 0.08, 0.02); wR.rotation.z = -0.35;
     g.add(wL, wR);
     g.userData.wings = [wL, wR];
+    g.userData.trailConfig = {
+      color: 0xffe27a,
+      count: 10,
+      size: 0.11,
+      opacity: 0.42,
+      interval: 0.035,
+      scaleDecay: 0.06,
+    };
 
     g.scale.setScalar(0.7);
     return g;
@@ -360,7 +461,16 @@ export class CompanionManager {
       g.add(talon);
     }
 
-    g.scale.setScalar(0.95);
+    g.userData.trailConfig = {
+      color: 0xf7f3ec,
+      count: 12,
+      size: 0.14,
+      opacity: 0.34,
+      interval: 0.045,
+      scaleDecay: 0.055,
+    };
+
+    g.scale.setScalar(1.75);
     return g;
   }
 
@@ -464,7 +574,7 @@ export class CompanionManager {
     tp.position.set(0, 0.031, 0.09);
     g.add(tp);
 
-    g.scale.setScalar(0.9);
+    g.scale.setScalar(1.45);
     return g;
   }
 
@@ -499,7 +609,7 @@ export class CompanionManager {
     g.add(pad);
 
     g.traverse(c => { if (c.isMesh) { c.renderOrder = 2; c.material.depthTest = false; } });
-    g.scale.setScalar(0.88);
+    g.scale.setScalar(1.45);
     return g;
   }
 

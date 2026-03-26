@@ -200,3 +200,71 @@ index.html   (shell — CSS + HTML structure only)
 - Source reference: https://github.com/spite/Wagner
 - This is a modernized local adaptation, not a raw drop-in of the original global-script repo.
 - Still needs screenshot-based tuning after a live browser run, especially for rainy and night scenes.
+
+---
+
+## 2026-03-26 — Interaction And Lofi Layout Pass
+
+### What changed
+
+- Raised the rabbit sit anchor substantially so it reads above the capybara instead of sinking into it.
+- Removed penguin from the Snowy Peak companion carousel so it no longer appears as a selectable option.
+- Made previous/current/next biome labels directly clickable in addition to the arrow buttons.
+- Added lightweight motion trails for the bee and eagle using pooled translucent sphere segments.
+- Added `capyHeightOffset` biome support and used it to place the capybara on the lofi desk surface.
+- Added a side table in the lofi room and moved the mug/plant cluster onto furniture instead of leaving them at floor level.
+- Upscaled the laptop and lemonade companions significantly for the lofi desk scene.
+
+### Still to verify
+
+- Check the lofi desk camera framing with the capybara now elevated on the desk.
+- Confirm the rabbit height still looks correct across meadow, mountain, and snowy.
+- Confirm the bee/eagle trails read as intentional and not too bright in motion.
+
+### Verification completed
+
+- Verified Lofi Desk via bundled Playwright client capture at `output/web-game-client/shot-0.png`: capybara is on the desk surface, biome labels are clickable, and the enlarged laptop/lemonade options remain available.
+- Verified bee trail visually at `output/manual-checks/meadow-bee.png`.
+- Verified rabbit elevation visually on Mountain Top at `output/manual-checks/mountain-rabbit.png`.
+- Verified eagle trail visually at `output/manual-checks/mountain-eagle.png`.
+- Verified Snowy Peak selector contents via `output/manual-checks/snowy-buttons.json`: only rabbit is exposed, penguin no longer appears.
+
+---
+
+## 2026-03-26 — Chill Sandbox Deluxe Pass
+
+### What changed
+
+- Extended `GameState` with progression data: chill points, unlocks, milestones, active interaction state, and peak-moment timers.
+- Added biome mastery metadata, interaction definitions, and unlock rewards in `src/core/Constants.js`.
+- Added `ProgressionSystem` for mastery rewards and `Peak Moment` triggering.
+- Added `InteractionSystem` for short biome-aware `Relax`, `Treat`, and `Play` moments with scene VFX and chill-point rewards.
+- Added a judge-facing HUD expansion:
+  - `JournalPanel` for biome objective, reward, and progression status
+  - `InteractionPanel` for the three action buttons
+  - lock-state treatment in biome and companion selectors
+  - chill-point readout in the control cluster
+- Added smooth camera lerp and peak-moment camera treatment in `SceneManager`.
+- Added lightweight synthesized biome ambience in `AudioManager`.
+- Tuned rain rendering to be less blocky and less overbright in screenshots.
+- Converted the Mountain `Eagle` into a hero perch companion with `capy_on_companion` behavior.
+- Replaced the README with submission-facing documentation instead of the upstream joke copy.
+
+### Verification
+
+- Verified clean load and updated HUD shell via Playwright capture:
+  - `output/web-game-client/shot-0.png`
+  - `output/web-game-client/state-0.json`
+- Verified Meadow mastery loop:
+  - selecting `Bee` in Meadow pushes rating to `great`
+  - unlocks `Mountain Top`
+  - updates chill points and unlock state
+  - artifacts:
+    - `output/web-game-meadow/shot-0.png`
+    - `output/web-game-meadow/state-0.json`
+
+### Remaining gaps
+
+- The Mountain eagle perch path was implemented, but I did not finish a stable automated capture for that exact scenario before stopping.
+- Companion art is still largely procedural; the new progression/interaction structure is ready for higher-fidelity assets later.
+- The interaction panel and companion strip share the bottom band on smaller screens and may still need spacing polish on narrow mobile widths.

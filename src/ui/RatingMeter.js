@@ -59,6 +59,7 @@ export class RatingMeter {
       top.textContent = LABELS[label] || label;
       top.style.color = COLORS[label] || COLORS.neutral;
     }
+    this._el.classList.toggle('peak', label === 'great');
 
     // Highlight active marker
     this._el.querySelectorAll('.meter-marker').forEach(m => {

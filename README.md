@@ -1,70 +1,64 @@
-# Capybara Simulator
+# Capybara Chill Scene Deluxe
 
-A serious and important contribution to the field of idle gaming.
+A polished capybara sandbox built for quick visual payoff, cozy interaction loops, and clear progression.
 
-## What Is This
+## What It Is
 
-You are presented with a capybara. The capybara sits. You may tap to change its hat. That is the full extent of your agency in this experience.
+This fork turns the original idle capybara toy into a compact chill-world builder:
 
-In return, you receive **Vibes**.
+- Switch between biomes with distinct atmosphere and audio
+- Pair the capybara with biome-specific companions
+- Chase biome mastery goals to unlock new spaces and companions
+- Trigger short interaction moments: `Relax`, `Treat`, and `Play`
+- Hit a perfect combo to launch a temporary `Peak Moment`
 
-Vibes are points. Points imply progress. Progress implies purpose. We make no such claim.
+The design goal is simple: strong first impression, readable scope, and no systems bloat.
 
-## Gameplay
+## Current Feature Set
 
-1. Open the game
-2. Observe the capybara
-3. Receive Vibes
-4. (Optional) Tap to change hat
-5. Continue receiving Vibes
+- Modular ES module architecture under [`src`](/Users/doobie/51 Projects/Web/Projects/PlayFun/Capybara games/capybara-simulator/src)
+- Unlockable biome progression with chill-point rewards
+- Companion unlocks with visible locked/unlocked UI states
+- Journal panel with current biome objective and reward hint
+- Interaction panel with three biome-aware actions
+- Peak-moment spectacle state with camera and VFX lift
+- Smooth biome camera travel instead of hard camera jumps
+- Ambient biome audio bed plus lofi music and weather audio
+- Improved rain readability for captures
+- Hero companion payoff on Mountain Top via the eagle perch
 
-There is no step 6.
+## What To Try First
 
-## Features
+1. Select the `Bee` in Meadow.
+2. Stay on `day` + `clear` to hit `Peak Capy`.
+3. Watch Meadow mastery unlock `Mountain Top`.
+4. Use `Play` in Meadow to see the interaction loop.
+5. Switch to Mountain Top and equip the `Eagle` for the hero perch moment.
 
-- **One (1) capybara**, rigged and animated
-- **Six (6) hats**, each more prestigious than the last
-- **Lofi music** — the capybara is unbothered and so should you be
-- **Rain mode** — for when you want to do nothing, but make it melancholic
-- **Vibes** — accrued passively, spent on nothing, worth everything
+## Controls
 
-## Technical Architecture
-
-It's one HTML file.
-
-## Installation
-
-```
-open index.html
-```
-
-Alternatively, do nothing. The game understands.
+- Top center: biome selector
+- Bottom center: companion selector
+- Bottom left: `Relax`, `Treat`, `Play`
+- Top right: chill counter, skip, mute, rain, night
+- Right edge: vibe meter
 
 ## Running Locally
 
 ```bash
-npx serve .
+python3 -m http.server 4173
 ```
 
-A Docker setup is also provided for those who prefer their inaction containerized.
+Then open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-## How To Win
+## Verification Artifacts
 
-This question reveals a fundamental misunderstanding of the product.
+Recent captures live under:
 
-## Contributing
+- [`output/web-game-client`](/Users/doobie/51 Projects/Web/Projects/PlayFun/Capybara games/capybara-simulator/output/web-game-client)
+- [`output/web-game-meadow`](/Users/doobie/51 Projects/Web/Projects/PlayFun/Capybara games/capybara-simulator/output/web-game-meadow)
 
-The capybara does not require your assistance. However, if you insist:
+## Notes
 
-1. Fork the repository
-2. Make your changes
-3. Ask yourself if the capybara would have wanted this
-4. Submit a PR
-
-## License
-
-CC0 1.0 Universal — No rights reserved. The capybara belongs to everyone. The capybara belongs to no one. The capybara simply is.
-
-## Acknowledgements
-
-The capybara, for its patience.
+- Progression is stored in browser local storage for the current device/browser session history.
+- The project still uses lightweight procedural companion art in several places; the progression and interaction layer is already structured so higher-fidelity companion assets can replace those meshes later.
